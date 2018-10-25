@@ -1,2 +1,3 @@
-# hacker-rank
+# HackerRank
+
 HackerRank problems, tutorials, contests...
