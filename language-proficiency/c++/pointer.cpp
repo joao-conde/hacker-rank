@@ -14,6 +14,4 @@ int main() {
     scanf("%d %d", &a, &b);
     update(pa, pb);
     printf("%d\n%d", a, b);
-
-    return 0;
 }

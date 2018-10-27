@@ -1,9 +1,7 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
 int main() {
-
     int size; cin >> size;
     vector<int> nums(size);
 
@@ -17,5 +15,4 @@ int main() {
         cout << nums[i] << " ";
     }
     cout << nums[size-1];
-
 }

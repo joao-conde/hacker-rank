@@ -21,5 +21,4 @@ int main(){
              else 
                 cout << "odd\n";
     }
-    return 0;
 }

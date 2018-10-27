@@ -13,6 +13,4 @@ int main() {
     b[0] = fa;
 
     cout << a << " " << b << endl;
-
-    return 0;
 }

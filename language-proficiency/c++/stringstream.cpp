@@ -1,7 +1,4 @@
-#include <vector>
-#include <iostream>
-#include <sstream>
-
+#include <bits/stdc++.h>
 using namespace std;
 
 vector<int> parseInts(string str) {
@@ -23,6 +20,4 @@ int main() {
     for(int i = 0; i < integers.size(); i++) {
         cout << integers[i] << "\n";
     }
-    
-    return 0;
 }

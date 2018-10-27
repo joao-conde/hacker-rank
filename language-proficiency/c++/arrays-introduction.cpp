@@ -1,13 +1,7 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
 
-
-int main() {
-
+int main(){
     int n;
     cin >> n;
     
@@ -20,7 +14,4 @@ int main() {
         cout << nums[i] << " ";
     }
     cout << nums[0] << endl;
-    
-    
-    return 0;
 }

@@ -1,5 +1,4 @@
-#include <iostream>
-#include <cstdio>
+#include <bits/stdc++.h>
 using namespace std;
 
 int main(){
@@ -10,6 +9,4 @@ int main(){
     double e;
     cin >> a >> b >> c >> d >> e;
     printf("%d\n%ld\n%c\n%3f\n%9lf\n", a, b, c, d, e);
-    
-    return 0;
 }

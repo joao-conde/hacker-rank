@@ -1,10 +1,7 @@
-#include <vector>
-#include <iostream>
-
+#include <bits/stdc++.h>
 using namespace std;
 
 int main(){
-
     int n, q;
     cin >> n >> q;
     vector<int> arrays[n];
@@ -25,6 +22,4 @@ int main(){
         cin >> j >> k;
         cout << arrays[j].at(k) << endl;
     }
-    
-    return 0;
 }

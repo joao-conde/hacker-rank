@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
 int main(){
@@ -17,6 +16,4 @@ int main(){
     else if(n == 3) cout << "three\n";
     else if(n == 2) cout << "two\n";
     else if(n == 1) cout << "one\n";
-
-    return 0;
 }
