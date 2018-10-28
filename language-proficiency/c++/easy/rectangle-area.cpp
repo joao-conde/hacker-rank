@@ -27,8 +27,7 @@ class RectangleArea : public Rectangle{
 };
 
 
-int main()
-{
+int main(){
     /*
      * Declare a RectangleArea object
      */
