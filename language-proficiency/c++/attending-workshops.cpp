@@ -28,27 +28,18 @@ Available_Workshops* initialize (int start_time[], int duration[], int n){
     return aws;
 }
 
-bool intersects(Workshop w1, Workshop w2){
-    int end1 = w1.start_time + w1.duration,
-        end2 = w2.start_time + w2.duration;
-    
-    return(!(w1.start_time >= end2 || end1 <= w2.start_time));
-}
+
 int CalculateMaxWorkshops(Available_Workshops* ptr){
-    int max = 0;
+    int max = 0, end_time = 0;
     vector<Workshop> ws = ptr->ws;
     sort(ws.begin(), ws.end());
-    while(!ws.empty()){
-        Workshop earliest = ws[0];
-        ws.erase(ws.begin());
-        for(unsigned int i = 0; i < ws.size(); i++){
-            if(intersects(earliest, ws[i])){      
-                ws.erase(ws.begin() + i);
-                i--;
-            }
-        }
-        max++;
-    }    
+      
+    for(int i = 0; i < ws.size(); i++){
+		if(ws[i].start_time >= end_time){
+			max++;
+			end_time = ws[i].start_time + ws[i].duration;
+		}
+	}
     return max;
 }
 
