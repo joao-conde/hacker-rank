@@ -8,7 +8,6 @@ int main(){
 	for(int i = 1; i <= n; i++){
 		for(int j = i+1; j <= n; j++){
 			int and = i & j, or = i | j, xor = i ^ j;
-			
 			andMax = (and < k && and > andMax ? and : andMax);
 			orMax = (or < k && or > orMax ? or : orMax);
 			xorMax = (xor < k && xor > xorMax ? xor : xorMax);
