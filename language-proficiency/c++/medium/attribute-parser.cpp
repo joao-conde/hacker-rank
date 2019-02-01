@@ -3,15 +3,11 @@
 using namespace std;
 
 class HRMLElement {
-   private:
    public:
     string HRMLId;
+    HRMLElement* parent = nullptr;
     unordered_map<string, string> attributes;
     unordered_map<string, HRMLElement*> children;
-
-    HRMLElement(){};
-
-    HRMLElement(string id) { HRMLId = id; };
 
     void addAttribute(string attr, string val) {
         attributes.insert({attr, val});
@@ -20,24 +16,7 @@ class HRMLElement {
     void addChild(string childID, HRMLElement* child) {
         children.insert({childID, child});
     }
-
-    friend ostream& operator<<(ostream& out, const HRMLElement& el) {
-        out << el.HRMLId << " has:\n";
-        for (auto p : el.attributes) {
-            out << p.first << " - " << p.second << endl;
-        }
-
-        for (auto c : el.children) {
-            out << "\tChild: ";
-            out << c.first << "\n";
-        }
-
-        cout << "\nEnd of node " << el.HRMLId << endl;
-        return out;
-    }
 };
-
-bool isClosingTag(string line) { return (line[0] == '<' && line[1] == '/'); }
 
 vector<string> readLines(int numLines) {
     vector<string> lines;
@@ -49,79 +28,101 @@ vector<string> readLines(int numLines) {
     return lines;
 }
 
-HRMLElement* parseHRMLOpenTag(string line) {
+bool isClosingTag(string line) { return (line[0] == '<' && line[1] == '/'); }
+
+HRMLElement* parseOpenTag(string openTag) {
+    HRMLElement* el = new HRMLElement();
+
+    // remove '<' and '>'
+    openTag.erase(openTag.begin());
+    openTag.erase(openTag.begin() + openTag.size() - 1);
+
     char dummy;
-    string label, label2;
-    line.erase(0, 1);                // remove '<'
-    line.erase(line.size() - 1, 1);  // remove '>'
+    string attr, val;
+    stringstream ss(openTag);
 
-    stringstream ss(line);
-    ss >> label;
+    ss >> el->HRMLId;  // elementID
 
-    HRMLElement* el = new HRMLElement(label);
     while (!ss.eof()) {
-        ss >> label >> dummy >> label2;
-        el->addAttribute(label, label2);
+        ss >> attr >> dummy >> val;
+        // remove "" from value
+        val.erase(val.begin());
+        val.erase(val.begin() + val.size() - 1);
+        el->addAttribute(attr, val);
     }
 
     return el;
 }
 
-HRMLElement* buildHRMLTree(vector<string>& lines) {
-    HRMLElement* root = parseHRMLOpenTag(lines[0]);
-    lines.erase(lines.begin() + 0);
-
-    while (!isClosingTag(lines[0])) {
-        HRMLElement* child = buildHRMLTree(lines);
-        root->addChild(child->HRMLId, child);
-    }
-
-    lines.erase(lines.begin() + 0);
-
-    return root;
-}
-
-int findNextOp(const string& query){
-    unsigned int dotPos = query.find('.'), tilPos = query.find('~');
-    if(dotPos == string::npos && tilPos == string::npos) return -1;
-    return (dotPos < tilPos ? dotPos : tilPos);
-}
-
-pair<string, char> getNextToken(string& query) {
-    char op = query[0];
-    string label;
-    query.erase(query.begin() + 0);
-
-    int endPos = findNextOp(query);
-    if(endPos == -1) endPos = query.size();
-
-    label = query.substr(0, endPos);
-    query.erase(query.begin(), query.begin() + endPos);
-
-    return {label, op};
-}
-
-void processQuery(string query, HRMLElement* rootTag) {
-    //remove 'tag1'
-    int endPos = findNextOp(query);
-    query.erase(query.begin(), query.begin() + endPos);
-
-    while (!query.empty()) {
-        pair<string, char> res = getNextToken(query);
-        if(res.second == '.'){
-            rootTag = rootTag->children[res.first];
-        }
-        else if(res.second == '~'){
-            if(rootTag->attributes.find(res.first) != rootTag->attributes.end()){
-                string sol = rootTag->attributes[res.first];
-                sol.erase(0, 1);
-                sol.erase(sol.size() - 1, 1);
-                cout << sol << endl;
+unordered_map<string, HRMLElement*> parseHRMLTree(const vector<string>& lines) {
+    unordered_map<string, HRMLElement*> document;
+    HRMLElement* cur = nullptr;
+    for (string line : lines) {
+        if (!isClosingTag(line)) {
+            HRMLElement* el = parseOpenTag(line);
+            if (cur != nullptr) {
+                cur->addChild(el->HRMLId, el);
+                el->parent = cur;
+                cur = el;
+            } else {
+                document.insert({el->HRMLId, el});
+                cur = el;
             }
-            else
-                cout << "Not Found!" << endl;
+        } else {
+            cur = cur->parent;
+        }
+    }
+    return document;
+}
 
-            break;
+void answerQueries(unordered_map<string, HRMLElement*>& document,
+                   int numQueries) {
+    for (int i = 0; i < numQueries; i++) {
+        string query;
+        cin >> query;
+
+        size_t firstTagPos = query.find('.');
+        if (firstTagPos == string::npos) firstTagPos = query.find('~');
+
+        HRMLElement* cur;
+        auto it = document.find(query.substr(0, firstTagPos));
+        if (it != document.end())
+            cur = it->second;
+        else {
+            cout << "Not Found!" << endl;
+            continue;
+        }
+        query.erase(query.begin(), query.begin() + firstTagPos);
+
+        while (!query.empty()) {
+            char op = query[0];
+            query.erase(query.begin());
+
+            if (op == '.') {
+                size_t pos = query.find('.');
+                if (pos == string::npos) pos = query.find('~');
+                if (pos == string::npos) pos = query.size() - 1;
+                string label = query.substr(0, pos);
+                query.erase(query.begin(), query.begin() + pos);
+
+                auto it = cur->children.find(label);
+                if (it != cur->children.end())
+                    cur = cur->children[label];  // dot operator
+                else {
+                    cout << "Not Found!" << endl;
+                    break;
+                }
+            }
+
+            if (op == '~') {
+                auto it = cur->attributes.find(query);
+                if (it != cur->attributes.end())
+                    cout << it->second << endl;
+                else
+                    cout << "Not Found!" << endl;
+
+                break;
+            }
         }
     }
 }
@@ -132,10 +133,7 @@ int main() {
     cin.ignore();
 
     vector<string> lines = readLines(numLines);
-    HRMLElement* root = buildHRMLTree(lines);
-    for (int i = 0; i < numQueries; i++) {
-        string query;
-        getline(cin, query);
-        processQuery(query, root);
-    }
+    unordered_map<string, HRMLElement*> document = parseHRMLTree(lines);
+
+    answerQueries(document, numQueries);
 }
