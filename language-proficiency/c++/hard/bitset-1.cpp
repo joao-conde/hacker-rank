@@ -4,7 +4,7 @@ using namespace std;
 typedef unsigned long long ull;
 
 
-ull getNext(ull prev, ull p, ull q, ull mod) { return prev * p + q % mod; }
+ull getNext(ull prev, ull p, ull q, ull mod) { return (prev * p + q) % mod; }
 
 int main() {
     int n, s, p, q;
@@ -16,15 +16,15 @@ int main() {
     hare = getNext(tortoise, p, q, mod);   	//third val
 
 	//cycle detection
-	int iter = 0;
+	int vals = 1;
 	while(tortoise != hare){
-		if(iter > n){
+		if(vals >= n){
 			cout << n << endl;
 			return 0;
 		}
 		tortoise = getNext(tortoise, p, q, mod);
 		hare = getNext(getNext(hare, p, q, mod), p, q, mod);
-		iter++;
+		vals++;
 	}
 
 	//determine cyle start
